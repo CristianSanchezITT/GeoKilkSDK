@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GeoKilkSDK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F1ECF8;--ink:#2A2140;--muted:#6E6488;--panel:#FFFFFF;--line:#DDD3EE;--acc:#8A57CC;--ok:#2E9E7C;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1D1730;--ink:#F1ECF8;--muted:#A99FC4;--panel:#2A2140;--line:#3D3259;--acc:#B58CF0;--ok:#7FE0C2}}
+:root[data-theme="dark"]{--bg:#1D1730;--ink:#F1ECF8;--muted:#A99FC4;--panel:#2A2140;--line:#3D3259;--acc:#B58CF0;--ok:#7FE0C2}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.45}
+header{max-width:1280px;margin:0 auto;padding:22px 18px 4px}
+h1{margin:0;font-size:clamp(1.6rem,4vw,2.3rem);font-weight:800;letter-spacing:-.02em}
+header p{margin:4px 0 0;color:var(--muted);max-width:70ch}
+.wrap{max-width:1280px;margin:0 auto;padding:16px 18px 40px;display:grid;gap:18px;grid-template-columns:1fr}
+@media (min-width:980px){.wrap{grid-template-columns:minmax(360px,440px) 1fr;align-items:start}.right{position:sticky;top:calc(12px + env(safe-area-inset-top,0px))}}
+.box{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:16px}
+.box h2{margin:0 0 12px;font-size:1.1rem;font-weight:800}
+.form{display:grid;gap:16px}
+label{display:grid;gap:4px;font-size:.9rem;font-weight:600}
+input[type=text],input[type=number],select{font:inherit;padding:7px 9px;border-radius:9px;border:2px solid var(--line);background:var(--bg);color:var(--ink);min-width:0;width:100%}
+input[type=color]{width:48px;height:36px;border:2px solid var(--line);border-radius:9px;background:var(--bg);padding:2px}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.check{display:flex;gap:8px;align-items:center;font-weight:600;font-size:.9rem}
+.note{font-size:.85rem;color:var(--muted);margin:0}
+.objrow{display:flex;gap:12px;align-items:center}
+.thumb{width:64px;height:64px;border-radius:12px;background:var(--bg);border:1px dashed var(--line);display:grid;place-items:center;font-size:2rem;overflow:hidden;flex:none}
+.thumb img{width:100%;height:100%;object-fit:contain}
+.crow{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:center;padding:8px;border:1px dashed var(--line);border-radius:12px}
+.crow .thumb{width:52px;height:52px;font-size:1.7rem}
+.crow .f{display:grid;grid-template-columns:1fr auto;gap:6px}
+.acts{grid-column:1/-1;display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;align-items:center}
+.filebtn{position:relative;overflow:hidden;display:inline-block;color:var(--acc);font-weight:700;cursor:pointer}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.link{font:inherit;background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0}
+.btn{font:inherit;font-weight:800;border:0;border-radius:12px;padding:10px 18px;background:var(--acc);color:#fff;cursor:pointer}
+.btn.alt{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+#preview{width:100%;height:640px;border:2px solid var(--line);border-radius:14px;background:repeating-conic-gradient(var(--line) 0 25%,transparent 0 50%) 0 0/20px 20px;display:block}
+.tabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.tabs button{font:inherit;font-weight:700;border:2px solid var(--line);background:transparent;color:var(--muted);border-radius:10px;padding:6px 12px;cursor:pointer}
+.tabs button[aria-selected=true]{border-color:var(--acc);color:var(--ink)}
+textarea{width:100%;height:150px;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:8px;resize:vertical}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+#ask{position:fixed;inset:0;display:none;place-items:center;background:rgba(20,14,36,.55);z-index:50;padding:20px}
+#ask.show{display:grid}
+#ask .dlg{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:20px;max-width:380px;width:100%}
+#ask p{margin:0 0 14px;font-weight:600}
+#status{color:var(--ok);font-weight:700;font-size:.9rem}
+.size{color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<header>
+  <h1>GeoKilkSDK</h1>
+  <p>Configura el juego con tu arte, revisa la vista previa y copia el código para pegarlo en tu web. El juego generado no incluye ningún menú de edición.</p>
+</header>
+
+<div class="wrap">
+  <div class="form">
+    <div class="box">
+      <h2>Importar / exportar ajustes</h2>
+      <p class="note" style="margin-bottom:8px">Pega aquí un código generado antes (embed o HTML) o un archivo de ajustes .json.</p>
+      <textarea id="impText" style="height:90px" placeholder="Pega aquí el código o los ajustes…" aria-label="Pegar ajustes para importar"></textarea>
+      <div class="row">
+        <button class="btn" id="impBtn" style="padding:8px 14px">Importar</button>
+        <span class="filebtn">Abrir archivo (.json o .html)<input type="file" accept=".json,.html,.htm,.txt,application/json,text/html" id="impFile"></span>
+      </div>
+      <div class="row" style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)">
+        <button class="btn alt" id="expCopy" style="padding:8px 14px">Copiar ajustes</button>
+        <button class="btn alt" id="expDl" style="padding:8px 14px" hidden>Descargar ajustes (.json)</button>
+      </div>
+      <p class="note" id="impMsg" role="status" style="margin-top:8px"></p>
+    </div>
+
+    <div class="box">
+      <h2>Textos</h2>
+      <div class="form" style="gap:10px">
+        <label>Título<input type="text" id="titulo" maxlength="40"></label>
+        <label>Subtítulo<input type="text" id="subtitulo" maxlength="120"></label>
+        <label>Nombre de la moneda<input type="text" id="moneda" maxlength="20"></label>
+        <label>Texto del botón al abrir<input type="text" id="botonOtro" maxlength="30"></label>
+      </div>
+    </div>
+
+    <div class="box">
+      <h2>Objeto a abrir</h2>
+      <div class="objrow">
+        <div class="thumb" id="objThumb"></div>
+        <div style="display:grid;gap:6px">
+          <span class="filebtn">Subir imagen<input type="file" accept="image/*" id="objFile"></span>
+          <button class="link" id="objReset" style="justify-self:start">Usar el predeterminado</button>
+        </div>
+      </div>
+      <p class="note" style="margin-top:8px">Las grietas y el brillo se dibujan encima. Un PNG cuadrado con fondo transparente se ve mejor.</p>
+    </div>
+
+    <div class="box">
+      <h2>Criaturas</h2>
+      <div id="clist" style="display:grid;gap:8px"></div>
+      <div class="row">
+        <button class="btn" id="add" style="padding:8px 14px">Añadir criatura</button>
+        <button class="link" id="restore">Restaurar las originales</button>
+      </div>
+    </div>
+
+    <div class="box">
+      <h2>Juego y apariencia</h2>
+      <div class="form" style="gap:10px">
+        <div class="grid2">
+          <label>Golpes para abrir el primero<input type="number" id="golpes" min="1" max="200"></label>
+          <label>Aumento por cada apertura<input type="number" id="aumento" min="0" max="10" step="0.1"></label>
+        </div>
+        <label style="grid-template-columns:auto 1fr;align-items:center;gap:10px">
+          <input type="color" id="acento"><span>Color de acento</span></label>
+        <label>Tema<select id="tema"><option value="auto">Automático (claro/oscuro)</option><option value="light">Siempre claro</option><option value="dark">Siempre oscuro</option></select></label>
+        <label class="check"><input type="checkbox" id="mejoras"> Mostrar mejoras</label>
+        <label class="check"><input type="checkbox" id="album"> Mostrar álbum</label>
+        <label class="check"><input type="checkbox" id="transparente"> Fondo transparente</label>
+        <label class="check"><input type="checkbox" id="guardar"> Guardar progreso del jugador</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="right form">
+    <div class="box">
+      <h2>Vista previa</h2>
+      <iframe id="preview" title="Vista previa del juego"></iframe>
+      <div class="row"><button class="link" id="reload">Reiniciar vista previa</button></div>
+    </div>
+    <div class="box">
+      <h2>Tu código</h2>
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-t="iframe">Embed para pegar</button>
+        <button role="tab" aria-selected="false" data-t="html">Archivo HTML</button>
+      </div>
+      <p class="note" id="tabNote"></p>
+      <textarea id="code" readonly aria-label="Código generado"></textarea>
+      <div class="row">
+        <button class="btn" id="copy">Copiar código</button>
+        <button class="btn alt" id="dl" hidden>Descargar HTML</button>
+        <span id="status" role="status"></span>
+        <span class="size" id="size"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="ask" role="dialog" aria-modal="true" aria-labelledby="askMsg">
+  <div class="dlg"><p id="askMsg"></p>
+    <div class="row" style="margin-top:0"><button class="btn" id="askYes">Sí, continuar</button><button class="btn alt" id="askNo">Cancelar</button></div></div>
+</div>
+
+<!-- Plantilla del juego generado -->
+<script type="text/plain" id="tpl">
+<!DOCTYPE html>
+<html lang="es"%%THEME%%>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>%%TITLE%%</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F1ECF8;--ink:#2A2140;--muted:#6E6488;--panel:#FFFFFF;--line:#DDD3EE;--acc:%%ACC%%;--mint:#3FBF9A;--gold:#C08A0E}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1D1730;--ink:#F1ECF8;--muted:#A99FC4;--panel:#2A2140;--line:#3D3259;--mint:#7FE0C2;--gold:#F2C14E}}
+:root[data-theme="dark"]{--bg:#1D1730;--ink:#F1ECF8;--muted:#A99FC4;--panel:#2A2140;--line:#3D3259;--mint:#7FE0C2;--gold:#F2C14E}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:%%BG%%;color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.45}
+main{max-width:960px;margin:0 auto;padding:20px 16px 32px;display:grid;gap:20px;grid-template-columns:1fr}
+@media (min-width:760px){main.two{grid-template-columns:1.15fr 1fr;align-items:start}}
+h1{font-size:clamp(1.7rem,5vw,2.5rem);font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.05}
+.sub{color:var(--muted);margin:6px 0 0}
+.stage{display:flex;flex-direction:column;align-items:center;gap:10px}
+.coins{font-size:2.2rem;font-weight:800;display:flex;align-items:baseline;gap:8px}
+.coins small{font-size:1rem;font-weight:600;color:var(--muted)}
+#objBtn{background:none;border:0;padding:0;cursor:pointer;position:relative;width:min(300px,78vw);aspect-ratio:1/1.1;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#objBtn:focus-visible,button:focus-visible{outline:3px solid var(--acc);outline-offset:4px;border-radius:16px}
+#objArt,#overlay{position:absolute;inset:0;width:100%;height:100%}
+#objArt img{width:100%;height:100%;object-fit:contain;display:block;user-select:none;-webkit-user-drag:none}
+#objArt svg,#overlay{display:block;overflow:visible;pointer-events:none}
+.shake{animation:shake .18s}
+@keyframes shake{0%{transform:rotate(0) scale(1)}30%{transform:rotate(-4deg) scale(.96)}60%{transform:rotate(3deg) scale(.98)}100%{transform:rotate(0) scale(1)}}
+.bar{width:min(300px,78vw);height:12px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--mint));transition:width .12s}
+.hint{color:var(--muted);font-size:.95rem;margin:0}
+.float{position:absolute;pointer-events:none;font-weight:800;color:var(--gold);animation:up .7s ease-out forwards;font-size:1.3rem;z-index:2}
+@keyframes up{to{transform:translateY(-60px);opacity:0}}
+.side{display:grid;gap:18px}
+h2{font-size:1.15rem;margin:0 0 10px;font-weight:800}
+.upg{display:grid;gap:8px}
+.upg button{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;text-align:left;font:inherit;color:inherit;background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:10px 12px;cursor:pointer}
+.upg button:hover:not(:disabled){border-color:var(--acc)}
+.upg button:disabled{opacity:.5;cursor:not-allowed}
+.upg .ic{font-size:1.6rem}.upg b{display:block}.upg .d{font-size:.85rem;color:var(--muted)}
+.upg .cost{font-weight:800;color:var(--gold);white-space:nowrap}
+.album{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:8px}
+.slot{background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center;font-size:.78rem;overflow-wrap:anywhere}
+.art{display:block;margin:0 auto 2px;width:44px;height:44px;font-size:1.9rem;line-height:44px}
+.art img{width:100%;height:100%;object-fit:contain}
+.slot.lock .art{filter:grayscale(1) brightness(0);opacity:.25}
+.r-raro{border-color:#5AA9E6}.r-épico{border-color:var(--acc)}.r-legendario{border-color:var(--gold)}.slot.lock{border-color:var(--line)}
+#reveal{position:fixed;inset:0;display:none;place-items:center;background:rgba(20,14,36,.6);z-index:10;padding:20px}
+#reveal.show{display:grid}
+.card{background:var(--panel);border-radius:22px;padding:26px 28px;text-align:center;max-width:320px;width:100%;border:3px solid var(--line);animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.card .art{width:140px;height:140px;font-size:5.5rem;line-height:140px}
+.card h3{margin:6px 0 2px;font-size:1.6rem}.card .rar{font-weight:800}
+.btn{font:inherit;font-weight:800;border:0;border-radius:12px;padding:10px 22px;background:var(--acc);color:#fff;cursor:pointer;margin-top:16px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main id="main">
+  <div class="stage">
+    <div style="text-align:center"><h1 id="title"></h1><p class="sub" id="subtitle"></p></div>
+    <div class="coins"><span id="coins">0</span><small id="currency"></small></div>
+    <button id="objBtn" aria-label="Golpear">
+      <div id="objArt"></div>
+      <svg id="overlay" viewBox="0 0 200 220" aria-hidden="true">
+        <defs><radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+        <circle id="glowC" cx="100" cy="110" r="75" fill="url(#glow)" opacity="0"/>
+        <g id="cracks" fill="none" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" stroke="#fff" style="filter:drop-shadow(0 0 3px rgba(0,0,0,.6))">
+          <path d="M100 30 L92 58 L104 76 L96 98"/><path d="M34 100 L60 108 L70 96 L92 112"/>
+          <path d="M166 96 L140 110 L148 124 L110 118"/><path d="M60 176 L74 152 L90 158 L98 132"/>
+          <path d="M146 174 L130 150 L118 158 L106 134"/><path d="M96 98 L100 118 L92 112 M110 118 L100 118 L98 132 L106 134"/>
+        </g>
+      </svg>
+    </button>
+    <div class="bar" id="bar" role="progressbar" aria-label="Progreso" aria-valuemin="0" aria-valuemax="100"><i id="barFill" style="width:0%"></i></div>
+    <p class="hint" id="hint"></p>
+  </div>
+  <div class="side" id="side">
+    <section id="upgSec"><h2>Mejoras</h2><div class="upg" id="upgrades"></div></section>
+    <section id="albSec"><h2>Álbum <span id="albumCount" style="color:var(--muted);font-weight:600"></span></h2><div class="album" id="album"></div></section>
+  </div>
+</main>
+<div id="reveal" role="dialog" aria-modal="true" aria-labelledby="rName">
+  <div class="card" id="rCard"><span class="art" id="rArt"></span><h3 id="rName"></h3><div class="rar" id="rRar"></div>
+  <div id="rReward" style="color:var(--muted);margin-top:4px"></div><button class="btn" id="rClose"></button></div>
+</div>
+<script>
+const CFG=%%CFG%%;
+const OBJ_SVG='<svg viewBox="0 0 200 220"><defs><radialGradient id="sg" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#B3A290"/><stop offset=".6" stop-color="#8C7B6B"/><stop offset="1" stop-color="#5E5147"/></radialGradient></defs><ellipse cx="100" cy="205" rx="62" ry="9" fill="#000" opacity=".15"/><path d="M100 12 C150 14 184 62 184 118 C184 170 148 200 100 200 C52 200 16 170 16 118 C16 62 50 10 100 12Z" fill="url(#sg)" stroke="#4A3F37" stroke-width="3"/><g fill="#6F6155" opacity=".55"><circle cx="62" cy="70" r="6"/><circle cx="140" cy="92" r="4"/><circle cx="118" cy="160" r="7"/><circle cx="48" cy="140" r="4"/><circle cx="150" cy="140" r="3"/><circle cx="96" cy="46" r="3"/></g></svg>';
+const RAR={'común':{w:70,reward:5,c:'var(--muted)'},'raro':{w:22,reward:15,c:'#5AA9E6'},'épico':{w:7,reward:40,c:'var(--acc)'},'legendario':{w:1,reward:120,c:'var(--gold)'}};
+const UPG=[{k:'tap',ic:'🔨',n:'Martillo',d:l=>'+1 de fuerza por toque (ahora '+(1+l)+')',base:15,mul:1.6},
+ {k:'auto',ic:'⛏️',n:'Golpe automático',d:l=>'Golpea solo '+(l+1)+' vez/seg',base:40,mul:1.7},
+ {k:'luck',ic:'🍀',n:'Trébol de la suerte',d:l=>'Más probabilidad de rarezas (nivel '+l+')',base:60,mul:1.8,max:10}];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const artHTML=c=>c.imagen?'<img src="'+c.imagen+'" alt="">':esc(c.emoji||'❓');
+let h=0;for(const ch of CFG.titulo+CFG.criaturas.map(c=>c.id).join())h=(h*31+ch.charCodeAt(0))|0;
+const KEY='clicker-'+Math.abs(h).toString(36);
+const fresh=()=>({coins:0,tap:0,auto:0,luck:0,hp:0,opened:0,col:{}});
+let S=fresh();
+if(CFG.guardar){try{const s=JSON.parse(localStorage.getItem(KEY));if(s)S=Object.assign(S,s)}catch(e){}}
+const save=()=>{if(CFG.guardar){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}};
+const maxHp=()=>Math.round(CFG.golpes+Math.min(CFG.golpes*4,S.opened*CFG.aumento));
+if(S.hp<=0||S.hp>maxHp())S.hp=maxHp();
+const cost=u=>Math.ceil(u.base*Math.pow(u.mul,S[u.k]));
+const btn=$('objBtn'),cracks=[...$('cracks').children];let paused=false;
+$('objArt').innerHTML=CFG.objetoImagen?'<img src="'+CFG.objetoImagen+'" alt="">':OBJ_SVG;
+$('title').textContent=CFG.titulo;$('subtitle').textContent=CFG.subtitulo;$('currency').textContent=CFG.moneda;$('rClose').textContent=CFG.botonOtro;
+if(!CFG.mostrarMejoras)$('upgSec').remove();
+if(!CFG.mostrarAlbum)$('albSec').remove();
+if(CFG.mostrarMejoras||CFG.mostrarAlbum)$('main').classList.add('two');else $('side').remove();
+function hit(p,tap,ev){if(paused)return;S.hp-=p;
+  if(tap){btn.classList.remove('shake');void btn.offsetWidth;btn.classList.add('shake');
+    const f=document.createElement('span');f.className='float';f.textContent='-'+p;const r=btn.getBoundingClientRect();
+    f.style.left=(ev&&ev.clientX?ev.clientX-r.left:r.width/2)+'px';f.style.top=(ev&&ev.clientY?ev.clientY-r.top:r.height/2)+'px';
+    btn.appendChild(f);setTimeout(()=>f.remove(),700)}
+  if(S.hp<=0)openIt();render()}
+function pick(){const L=CFG.criaturas.filter(c=>RAR[c.rareza]);if(!L.length)return null;
+  const b=S.luck,w={'común':Math.max(20,70-b*5),'raro':22+b*2,'épico':7+b*2,'legendario':1+b};
+  const av=Object.keys(w).filter(r=>L.some(c=>c.rareza===r));let x=Math.random()*av.reduce((a,r)=>a+w[r],0),rar=av[0];
+  for(const r of av){if((x-=w[r])<0){rar=r;break}}const P=L.filter(c=>c.rareza===rar);return P[Math.floor(Math.random()*P.length)]}
+function openIt(){const c=pick();S.opened++;S.hp=maxHp();if(!c){render();return}paused=true;const nw=!S.col[c.id];
+  S.col[c.id]=(S.col[c.id]||0)+1;const rw=RAR[c.rareza].reward*(nw?2:1);S.coins+=rw;save();
+  $('rArt').innerHTML=artHTML(c);$('rName').textContent=c.nombre;$('rRar').textContent=c.rareza[0].toUpperCase()+c.rareza.slice(1);
+  $('rRar').style.color=RAR[c.rareza].c;$('rCard').style.borderColor=RAR[c.rareza].c;
+  $('rReward').textContent=(nw&&CFG.mostrarAlbum?'¡Nueva en tu álbum! ':'')+'+'+rw+' '+CFG.moneda;
+  $('reveal').classList.add('show');$('rClose').focus()}
+$('rClose').onclick=()=>{$('reveal').classList.remove('show');paused=false;btn.focus();render()};
+btn.addEventListener('click',e=>hit(1+S.tap,true,e));
+function render(){$('coins').textContent=S.coins;const p=1-Math.max(0,S.hp)/maxHp();
+  $('barFill').style.width=(p*100)+'%';$('bar').setAttribute('aria-valuenow',Math.round(p*100));
+  const n=Math.ceil(p*cracks.length);cracks.forEach((c,i)=>c.style.opacity=i<n?1:0);$('glowC').setAttribute('opacity',(p*.7).toFixed(2));
+  $('hint').textContent=S.hp<maxHp()?'Faltan '+Math.max(0,S.hp)+' golpes':'Tócalo para empezar';
+  if(CFG.mostrarMejoras){const u=$('upgrades');u.innerHTML='';UPG.forEach(g=>{const b=document.createElement('button');const mx=g.max&&S[g.k]>=g.max;const c=cost(g);
+    b.disabled=mx||S.coins<c;b.innerHTML='<span class="ic">'+g.ic+'</span><span><b>'+g.n+'</b><span class="d">'+g.d(S[g.k])+'</span></span><span class="cost">'+(mx?'Máx.':c+' '+esc(CFG.moneda))+'</span>';
+    b.onclick=()=>{if(S.coins>=c&&!mx){S.coins-=c;S[g.k]++;save();render()}};u.appendChild(b)})}
+  if(CFG.mostrarAlbum){const a=$('album');a.innerHTML='';let got=0;CFG.criaturas.forEach(c=>{const hv=S.col[c.id];if(hv)got++;
+    const d=document.createElement('div');d.className='slot r-'+c.rareza+(hv?'':' lock');d.innerHTML='<span class="art">'+artHTML(c)+'</span>'+(hv?esc(c.nombre)+' ×'+hv:'???');a.appendChild(d)});
+    $('albumCount').textContent=got+'/'+CFG.criaturas.length}}
+setInterval(()=>{if(CFG.mostrarMejoras&&S.auto>0)hit(S.auto,false)},1000);setInterval(save,5000);render();
+<\/script>
+</body>
+</html>
+</script>
+
+<script>
+const DEFAULTS={
+  titulo:'Geodas Mágicas',subtitulo:'Golpéalo hasta que se abra y descubre qué criatura vive dentro.',
+  moneda:'cristales',botonOtro:'Abrir otro',objetoImagen:'',golpes:10,aumento:0.8,acento:'#8A57CC',tema:'auto',
+  mostrarMejoras:true,mostrarAlbum:true,transparente:false,guardar:true,
+  criaturas:[
+    {id:'c1',nombre:'Burbujo',rareza:'común',emoji:'🐙',imagen:''},{id:'c2',nombre:'Nubecita',rareza:'común',emoji:'🐑',imagen:''},
+    {id:'c3',nombre:'Gominola',rareza:'común',emoji:'🐌',imagen:''},{id:'c4',nombre:'Musgolo',rareza:'común',emoji:'🐸',imagen:''},
+    {id:'c5',nombre:'Saltarín',rareza:'común',emoji:'🦗',imagen:''},{id:'c6',nombre:'Lunari',rareza:'raro',emoji:'🦉',imagen:''},
+    {id:'c7',nombre:'Cristalón',rareza:'raro',emoji:'🦀',imagen:''},{id:'c8',nombre:'Coralina',rareza:'raro',emoji:'🐠',imagen:''},
+    {id:'c9',nombre:'Aurora',rareza:'épico',emoji:'🦋',imagen:''},{id:'c10',nombre:'Tortugón',rareza:'épico',emoji:'🐢',imagen:''},
+    {id:'c11',nombre:'Estelar',rareza:'legendario',emoji:'🐋',imagen:''},{id:'c12',nombre:'Draconis',rareza:'legendario',emoji:'🐉',imagen:''}
+  ]};
+const RARS=['común','raro','épico','legendario'];
+const EKEY='clicker-editor-v1';
+const clone=o=>JSON.parse(JSON.stringify(o));
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+let C=clone(DEFAULTS);
+try{const s=JSON.parse(localStorage.getItem(EKEY));if(s)C=Object.assign(C,s)}catch(e){}
+let tab='iframe';
+
+function persist(){try{localStorage.setItem(EKEY,JSON.stringify(C))}catch(e){status('Las imágenes son muy grandes para recordar tu edición en este navegador, pero el código se genera igual.',true)}}
+function status(t,warn){const s=$('status');s.textContent=t;s.style.color=warn?'var(--muted)':'var(--ok)';clearTimeout(status.t);status.t=setTimeout(()=>s.textContent='',3500)}
+
+function shrink(file,max){return new Promise((res,rej)=>{const r=new FileReader();r.onerror=rej;
+  r.onload=()=>{const img=new Image();img.onerror=rej;img.onload=()=>{const s=Math.min(1,max/Math.max(img.width,img.height));
+    const cv=document.createElement('canvas');cv.width=Math.round(img.width*s);cv.height=Math.round(img.height*s);
+    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+    let out=cv.toDataURL('image/webp',.85);if(!out.startsWith('data:image/webp'))out=cv.toDataURL('image/png');res(out)};img.src=r.result};
+  r.readAsDataURL(file)})}
+
+function buildGame(){
+  const cfg={titulo:C.titulo,subtitulo:C.subtitulo,moneda:C.moneda,botonOtro:C.botonOtro,objetoImagen:C.objetoImagen,
+    golpes:Math.max(1,+C.golpes||10),aumento:Math.max(0,+C.aumento||0),mostrarMejoras:C.mostrarMejoras,mostrarAlbum:C.mostrarAlbum,guardar:C.guardar,acento:C.acento,tema:C.tema,transparente:C.transparente,
+    criaturas:C.criaturas.map(c=>({id:c.id,nombre:c.nombre,rareza:c.rareza,emoji:c.emoji,imagen:c.imagen}))};
+  const json=JSON.stringify(cfg).replace(/</g,'\\u003c');
+  const acc=/^#[0-9a-fA-F]{6}$/.test(C.acento)?C.acento:'#8A57CC';
+  return $('tpl').textContent.trim()
+    .replace('<\\/script>','</'+'script>')
+    .replace('%%THEME%%',C.tema==='auto'?'':' data-theme="'+C.tema+'"')
+    .replace('%%TITLE%%',esc(C.titulo))
+    .replace('%%ACC%%',acc)
+    .replace('%%BG%%',C.transparente?'transparent':'var(--bg)')
+    .replace('%%CFG%%',()=>json);
+}
+function buildIframe(html){
+  const a=html.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+  return '<iframe title="'+esc(C.titulo)+'" srcdoc="'+a+'" style="width:100%;max-width:960px;height:720px;border:0;display:block;margin:0 auto'+(C.transparente?';background:transparent" allowtransparency="true':'')+'"></iframe>';
+}
+let tmr;
+function update(){clearTimeout(tmr);tmr=setTimeout(()=>{
+  const html=buildGame();$('preview').srcdoc=html;
+  const out=tab==='iframe'?buildIframe(html):html;$('code').value=out;
+  const kb=new Blob([out]).size/1024;$('size').textContent=kb>1024?(kb/1024).toFixed(1)+' MB':Math.round(kb)+' KB';
+  $('tabNote').textContent=tab==='iframe'
+    ?'Pega esto directamente en el HTML de tu página (Blogger, WordPress en modo HTML, Wix con "Insertar código", etc.). Ajusta height si lo necesitas.'
+    :'Guárdalo como juego.html, súbelo a tu hosting (o a GitHub Pages / itch.io) y enlázalo o insértalo con un iframe.';
+  persist()},150)}
+
+const TEXTS=['titulo','subtitulo','moneda','botonOtro'],CHECKS=['mejoras:mostrarMejoras','album:mostrarAlbum','transparente:transparente','guardar:guardar'];
+function syncForm(){TEXTS.forEach(id=>$(id).value=C[id]);
+  $('golpes').value=C.golpes;$('aumento').value=C.aumento;$('acento').value=C.acento;$('tema').value=C.tema;
+  CHECKS.forEach(p=>{const[id,k]=p.split(':');$(id).checked=C[k]})}
+TEXTS.forEach(id=>{$(id).oninput=()=>{C[id]=$(id).value;update()}});
+$('golpes').oninput=e=>{C.golpes=+e.target.value;update()};
+$('aumento').oninput=e=>{C.aumento=+e.target.value;update()};
+$('acento').oninput=e=>{C.acento=e.target.value;update()};
+$('tema').onchange=e=>{C.tema=e.target.value;update()};
+CHECKS.forEach(p=>{const[id,k]=p.split(':');$(id).onchange=e=>{C[k]=e.target.checked;update()}});
+
+function askConfirm(msg){return new Promise(res=>{const a=$('ask'),prev=document.activeElement;
+  $('askMsg').textContent=msg;a.classList.add('show');$('askYes').focus();
+  const done=v=>{a.classList.remove('show');$('askYes').onclick=$('askNo').onclick=null;document.removeEventListener('keydown',key);if(prev&&prev.focus)prev.focus();res(v)};
+  const key=e=>{if(e.key==='Escape')done(false)};document.addEventListener('keydown',key);
+  $('askYes').onclick=()=>done(true);$('askNo').onclick=()=>done(false)})}
+/* ---------- Importar / exportar ---------- */
+function impMsg(t,bad){const m=$('impMsg');m.textContent=t;m.style.color=bad?'#D0476A':'var(--ok)'}
+function decodeEntities(s){return s.replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&')}
+function extractConfig(text){
+  let t=text.trim();if(!t)throw new Error('vacío');
+  if(t[0]==='{')return JSON.parse(t);
+  if(/srcdoc="/.test(t))t=decodeEntities(t);
+  const m=t.match(/const CFG=(\{[\s\S]*?\});\s*\n/);
+  if(m)return JSON.parse(m[1]);
+  throw new Error('formato');
+}
+const okImg=s=>typeof s==='string'&&/^(data:image\/[a-z+.-]+;base64,|https?:\/\/)/i.test(s)?s:'';
+const str=(v,d,max)=>typeof v==='string'?v.slice(0,max):d;
+const num=(v,d,lo,hi)=>{v=Number(v);return isFinite(v)?Math.min(hi,Math.max(lo,v)):d};
+const bool=(v,d)=>typeof v==='boolean'?v:d;
+function sanitize(raw){
+  if(!raw||typeof raw!=='object')throw new Error('formato');
+  const src=raw.editor&&typeof raw.editor==='object'?raw.editor:raw;
+  const D=DEFAULTS,out={
+    titulo:str(src.titulo,D.titulo,40),subtitulo:str(src.subtitulo,D.subtitulo,120),moneda:str(src.moneda,D.moneda,20),
+    botonOtro:str(src.botonOtro,D.botonOtro,30),objetoImagen:okImg(src.objetoImagen),
+    golpes:num(src.golpes,D.golpes,1,200),aumento:num(src.aumento,D.aumento,0,10),
+    acento:/^#[0-9a-fA-F]{6}$/.test(src.acento)?src.acento:D.acento,
+    tema:['auto','light','dark'].includes(src.tema)?src.tema:D.tema,
+    mostrarMejoras:bool(src.mostrarMejoras,D.mostrarMejoras),mostrarAlbum:bool(src.mostrarAlbum,D.mostrarAlbum),
+    transparente:bool(src.transparente,D.transparente),guardar:bool(src.guardar,D.guardar)};
+  const list=Array.isArray(src.criaturas)?src.criaturas.filter(c=>c&&typeof c==='object').slice(0,200):[];
+  const seen=new Set();
+  out.criaturas=list.map((c,i)=>{let id=typeof c.id==='string'&&c.id.trim()?c.id.slice(0,40):'c'+i+'-'+Date.now().toString(36);
+    while(seen.has(id))id+='x';seen.add(id);
+    return{id,nombre:str(c.nombre,'Sin nombre',24)||'Sin nombre',rareza:RARS.includes(c.rareza)?c.rareza:'común',
+      emoji:str(c.emoji,'❓',8)||'❓',imagen:okImg(c.imagen)}});
+  if(!out.criaturas.length)out.criaturas=clone(D.criaturas);
+  return out;
+}
+async function doImport(text){
+  let cfg;
+  try{cfg=sanitize(extractConfig(text))}
+  catch(e){impMsg(e.message==='vacío'?'Pega primero el código o los ajustes.':'No encontré ajustes válidos. Pega un código generado por este editor o un archivo de ajustes .json.',true);return}
+  if(!(await askConfirm('¿Reemplazar la configuración actual con la importada ('+cfg.criaturas.length+' criaturas)?'))){impMsg('Importación cancelada.',true);return}
+  C=cfg;syncForm();renderObj();renderList();update();
+  $('impText').value='';impMsg('Ajustes importados: '+C.criaturas.length+' criatura'+(C.criaturas.length===1?'':'s')+'.');
+}
+$('impBtn').onclick=()=>doImport($('impText').value);
+$('impFile').onchange=e=>{const f=e.target.files[0];if(!f)return;impMsg('Leyendo '+f.name+'…');const r=new FileReader();
+  r.onload=()=>doImport(String(r.result));r.onerror=()=>impMsg('No se pudo leer el archivo.',true);r.readAsText(f);e.target.value=''};
+const exportJSON=()=>JSON.stringify({formato:'clicker-apertura',version:1,editor:C},null,2);
+$('expCopy').onclick=async()=>{const t=exportJSON();
+  try{await navigator.clipboard.writeText(t);impMsg('Ajustes copiados. Pégalos aquí cuando quieras restaurarlos.')}
+  catch(e){$('impText').value=t;$('impText').select();impMsg('Los ajustes quedaron en el cuadro de arriba; cópialos desde ahí.')}};
+
+function renderObj(){$('objThumb').innerHTML=C.objetoImagen?'<img src="'+C.objetoImagen+'" alt="">':'🪨'}
+$('objFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{C.objetoImagen=await shrink(f,480);renderObj();update();status('Objeto actualizado')}catch(err){status('No se pudo leer esa imagen',true)}e.target.value=''};
+$('objReset').onclick=()=>{C.objetoImagen='';renderObj();update()};
+
+function renderList(){const L=$('clist');L.innerHTML='';
+  C.criaturas.forEach((c,i)=>{const row=document.createElement('div');row.className='crow';
+    row.innerHTML='<div class="thumb">'+(c.imagen?'<img src="'+c.imagen+'" alt="">':esc(c.emoji||'❓'))+'</div>'+
+      '<div class="f"><input type="text" aria-label="Nombre de la criatura" maxlength="24" value="'+esc(c.nombre)+'">'+
+      '<select aria-label="Rareza">'+RARS.map(r=>'<option'+(r===c.rareza?' selected':'')+'>'+r+'</option>').join('')+'</select></div>'+
+      '<div class="acts"><span class="filebtn">Subir imagen<input type="file" accept="image/*"></span>'+
+      (c.imagen?'<button class="link" data-a="noimg">Quitar imagen</button>':'')+
+      '<button class="link" data-a="up"'+(i===0?' disabled':'')+'>Subir</button><button class="link" data-a="del">Eliminar</button></div>';
+    const nm=row.querySelector('input[type=text]'),sel=row.querySelector('select');
+    nm.oninput=()=>{c.nombre=nm.value||'Sin nombre';update()};
+    sel.onchange=()=>{c.rareza=sel.value;update()};
+    row.querySelector('input[type=file]').onchange=async e=>{const f=e.target.files[0];if(!f)return;
+      try{c.imagen=await shrink(f,320);renderList();update();status('Imagen añadida')}catch(err){status('No se pudo leer esa imagen',true)}};
+    row.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;
+      if(a==='noimg')c.imagen='';
+      else if(a==='up'&&i>0){[C.criaturas[i-1],C.criaturas[i]]=[C.criaturas[i],C.criaturas[i-1]]}
+      else if(a==='del'){if(C.criaturas.length<=1){status('Necesitas al menos una criatura',true);return}C.criaturas.splice(i,1)}
+      renderList();update()});
+    L.appendChild(row)})}
+$('add').onclick=()=>{C.criaturas.push({id:'c'+Date.now().toString(36),nombre:'Nueva criatura',rareza:'común',emoji:'❓',imagen:''});renderList();update()};
+$('restore').onclick=async()=>{if(await askConfirm('¿Volver a las criaturas originales? Se quitarán las que añadiste.')){C.criaturas=clone(DEFAULTS.criaturas);renderList();update()}};
+$('reload').onclick=()=>{$('preview').srcdoc='';setTimeout(()=>$('preview').srcdoc=buildGame(),30)};
+
+document.querySelectorAll('[role=tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.t;
+  document.querySelectorAll('[role=tab]').forEach(x=>x.setAttribute('aria-selected',x===b));update()});
+
+$('copy').onclick=async()=>{const t=$('code');
+  try{await navigator.clipboard.writeText(t.value);status('Código copiado')}
+  catch(e){t.focus();t.select();try{document.execCommand('copy');status('Código copiado')}catch(e2){status('Selecciona el texto y cópialo manualmente',true)}}};
+
+(async()=>{try{const dl=window.claude&&await window.claude.use('downloads');if(!dl)return;
+  const x=$('expDl');x.hidden=false;
+  x.onclick=async()=>{x.disabled=true;try{await dl.save({filename:'ajustes-clicker.json',data:exportJSON()});impMsg('Ajustes guardados.')}
+    catch(e){if(e&&e.code!=='declined')impMsg('No se pudo descargar aquí; usa Copiar ajustes.',true)}finally{x.disabled=false}};
+  const b=$('dl');b.hidden=false;
+  b.onclick=async()=>{b.disabled=true;try{await dl.save({filename:(C.titulo||'juego').replace(/[^\w\-áéíóúñÁÉÍÓÚÑ ]/g,'').trim().replace(/\s+/g,'-').toLowerCase()+'.html',data:buildGame()});status('Archivo guardado')}
+      catch(e){if(e&&e.code!=='declined')status('No se pudo descargar aquí; usa Copiar código',true)}finally{b.disabled=false}}}catch(e){}})();
+
+syncForm();renderObj();renderList();update();
+</script>
+</body>
+</html>
